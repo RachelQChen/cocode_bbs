@@ -6,7 +6,7 @@ from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm,\
     CommentForm
 from .. import db
-from ..models import Permission, Role, User, Post, Comment
+from ..models import Permission, Role, User, Post, Comment, Node
 from ..decorators import admin_required, permission_required
 
 
@@ -55,6 +55,22 @@ def index():
     posts = pagination.items
     return render_template('index.html', form=form, posts=posts,
                            show_followed=show_followed, pagination=pagination)
+
+@main.route('/nodes', method=['GET'])
+def nodes():
+    nodes = []
+    for n in Node.query.order_by(Node.id).all():
+        page = request.args.get('page', 1, type=int)
+        query = Post.query.filter_by(node_id=n.id).all()
+        pagination = query.order_by(Post.timestamp.desc()).paginate(
+            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+            error_out=False)
+        posts = pagination.items
+        node = {}
+        node[posts] = posts
+        node[pagination] = pagination
+        nodes.append(node)
+    return render_template('nodes.html', nodes=nodes)
 
 
 @main.route('/user/<username>')
