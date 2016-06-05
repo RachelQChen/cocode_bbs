@@ -18,6 +18,13 @@ class Permission:
     ADMINISTER = 0x80
 
 
+class Node(db.Model):
+    __tablename__ = 'nodes'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    posts = db.relationship('Post', backref='node', lazy='dynamic')
+
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -293,6 +300,7 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    node_id = db.Column(db.Integer, db.ForeignKey('nodes.id'))
 
     @staticmethod
     def generate_fake(count=100):
