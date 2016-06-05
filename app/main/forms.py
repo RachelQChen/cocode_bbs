@@ -55,7 +55,7 @@ class PostForm(Form):
     node = SelectField('板块', coerce=int)
     submit = SubmitField('Submit')
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         self.node.choices = [(node.id, node.name)
                              for node in Node.query.order_by(Node.name).all()]
