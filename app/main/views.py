@@ -58,19 +58,25 @@ def index():
 
 @main.route('/nodes', method=['GET'])
 def nodes():
-    nodes = []
-    for n in Node.query.order_by(Node.id).all():
-        page = request.args.get('page', 1, type=int)
-        query = Post.query.filter_by(node_id=n.id).all()
-        pagination = query.order_by(Post.timestamp.desc()).paginate(
-            page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-            error_out=False)
-        posts = pagination.items
-        node = {}
-        node[posts] = posts
-        node[pagination] = pagination
+    nodes =[]
+    for node in Node.query.order_by(Node.id).all():
         nodes.append(node)
     return render_template('nodes.html', nodes=nodes)
+
+@main.route('/node/<int:id>', method=['GET'])
+def node(id):
+    nodes =[]
+    for node in Node.query.order_by(Node.id).all():
+        nodes.append(node)
+    node = Node.query.filter_by(id).first()
+    page = request.args.get('page', 1, type=int)
+    query = Post.query.filter_by(node_id=node.id).all()
+    pagination = query.order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
+    posts = pagination.items
+    return render_template('node.html', posts=posts, pagination=pagination, nodes=nodes)
+
 
 
 @main.route('/user/<username>')
